@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Taxi Fare Prediction</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+    }
+
+    header {
+      width: 100%;
+      background-color: #1e3d59;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .page-container {
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 72px); /* Full height minus header */
+    }
+
+    
+    .right-form {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 35px;
+      background-color: #f0f2f5;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 480px;
+      background-color: #ffffff;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 0;
+      font-size: 18px;
+      background-color: #1e3d59;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0d2438;
+    }
+
+    @media (max-width: 768px) {
+      .page-container {
+        flex-direction: column;
+      }
+
+      .left-image {
+        height: 200px;
+        flex: none;
+        background-position: center;
+      }
+
+      .form-container {
+        max-width: 100%;
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    Taxi Fare Prediction
+  </header>
+
+  <div class="page-container">
+    <div class="left-image"></div>
+
+    <div class="right-form">
+      <div class="form-container">
+        <div class="form-group">
+          <label for="datetime">Select Day & Time</label>
+          <input type="datetime-local" id="datetime" name="datetime" />
+        </div>
+
+        <div class="form-group">
+          <label for="pickup">Select Pickup</label>
+          <select id="pickup" name="pickup">
+            
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="drop">Select Destination</label>
+          <select id="drop" name="drop">
+	  </select>
+        </div>
+            
+  <script>
+    // Location list object (id: name)
+    const locations = {
+      1: "Newark Airport, EWR",
+      2: "Jamaica Bay, Boro Zone, Queens",
+      3: "Allerton/Pelham Gardens, Boro Zone, Bronx",
+      4: "Alphabet City, Yellow Zone, Manhattan",
+      5: "Arden Heights, Boro Zone, Staten Island",
+      6: "Arrochar/Fort Wadsworth, Boro Zone, Staten Island",
+      7: "Astoria, Boro Zone, Queens",
+      8: "Astoria Park, Boro Zone, Queens",
+      9: "Auburndale, Boro Zone, Queens",
+      10: "Baisley Park, Boro Zone, Queens",
+      11: "Bath Beach, Boro Zone, Brooklyn",
+      12: "Battery Park, Yellow Zone, Manhattan",
+      13: "Battery Park City, Yellow Zone, Manhattan",
+      14: "Bay Ridge, Boro Zone, Brooklyn",
+      15: "Bay Terrace/Fort Totten, Boro Zone, Queens",
+      16: "Bayside, Boro Zone, Queens",
+      17: "Bedford, Boro Zone, Brooklyn",
+      18: "Bedford Park, Boro Zone, Bronx",
+      19: "Bellerose, Boro Zone, Queens",
+      20: "Belmont, Boro Zone, Bronx",
+      21: "Bensonhurst East, Boro Zone, Brooklyn",
+      22: "Bensonhurst West, Boro Zone, Brooklyn",
+      23: "Bloomfield/Emerson Hill, Boro Zone, Staten Island",
+      24: "Bloomingdale, Yellow Zone, Manhattan",
+      25: "Boerum Hill, Boro Zone, Brooklyn",
+      26: "Borough Park, Boro Zone, Brooklyn",
+      27: "Breezy Point/Fort Tilden/Riis Beach, Boro Zone, Queens",
+      28: "Briarwood/Jamaica Hills, Boro Zone, Queens",
+      29: "Brighton Beach, Boro Zone, Brooklyn",
+      30: "Broad Channel, Boro Zone, Queens",
+      31: "Bronx Park, Boro Zone, Bronx",
+      32: "Bronxdale, Boro Zone, Bronx",
+      33: "Brooklyn Heights, Boro Zone, Brooklyn",
+      34: "Brooklyn Navy Yard, Boro Zone, Brooklyn",
+      35: "Brownsville, Boro Zone, Brooklyn",
+      36: "Bushwick North, Boro Zone, Brooklyn",
+      37: "Bushwick South, Boro Zone, Brooklyn",
+      38: "Cambria Heights, Boro Zone, Queens",
+      39: "Canarsie, Boro Zone, Brooklyn",
+      40: "Carroll Gardens, Boro Zone, Brooklyn",
+      41: "Central Harlem, Boro Zone, Manhattan",
+      42: "Central Harlem North, Boro Zone, Manhattan",
+      43: "Central Park, Yellow Zone, Manhattan",
+      44: "Charleston/Tottenville, Boro Zone, Staten Island",
+      45: "Chinatown, Yellow Zone, Manhattan",
+      46: "City Island, Boro Zone, Bronx",
+      47: "Claremont/Bathgate, Boro Zone, Bronx",
+      48: "Clinton East, Yellow Zone, Manhattan",
+      49: "Clinton Hill, Boro Zone, Brooklyn",
+      50: "Clinton West, Yellow Zone, Manhattan",
+      51: "Co-Op City, Boro Zone, Bronx",
+      52: "Cobble Hill, Boro Zone, Brooklyn",
+      53: "College Point, Boro Zone, Queens",
+      54: "Columbia Street, Boro Zone, Brooklyn",
+      55: "Coney Island, Boro Zone, Brooklyn",
+      56: "Corona, Boro Zone, Queens",
+      57: "Corona, Boro Zone, Queens",
+      58: "Country Club, Boro Zone, Bronx",
+      59: "Crotona Park, Boro Zone, Bronx",
+      60: "Crotona Park East, Boro Zone, Bronx",
+      61: "Crown Heights North, Boro Zone, Brooklyn",
+      62: "Crown Heights South, Boro Zone, Brooklyn",
+      63: "Cypress Hills, Boro Zone, Brooklyn",
+      64: "Douglaston, Boro Zone, Queens",
+      65: "Downtown Brooklyn/MetroTech, Boro Zone, Brooklyn",
+      66: "DUMBO/Vinegar Hill, Boro Zone, Brooklyn",
+      67: "Dyker Heights, Boro Zone, Brooklyn",
+      68: "East Chelsea, Yellow Zone, Manhattan",
+      69: "East Concourse/Concourse Village, Boro Zone, Bronx",
+      70: "East Elmhurst, Boro Zone, Queens",
+      71: "East Flatbush/Farragut, Boro Zone, Brooklyn",
+      72: "East Flatbush/Remsen Village, Boro Zone, Brooklyn",
+      73: "East Flushing, Boro Zone, Queens",
+      74: "East Harlem North, Boro Zone, Manhattan",
+      75: "East Harlem South, Boro Zone, Manhattan",
+      76: "East New York, Boro Zone, Brooklyn",
+      77: "East New York/Pennsylvania Avenue, Boro Zone, Brooklyn",
+      78: "East Tremont, Boro Zone, Bronx",
+      79: "East Village, Yellow Zone, Manhattan",
+      80: "East Williamsburg, Boro Zone, Brooklyn",
+      81: "Eastchester, Boro Zone, Bronx",
+      82: "Elmhurst, Boro Zone, Queens",
+      83: "Elmhurst/Maspeth, Boro Zone, Queens",
+      84: "Eltingville/Annadale/Prince's Bay, Boro Zone, Staten Island",
+      85: "Erasmus, Boro Zone, Brooklyn",
+      86: "Far Rockaway, Boro Zone, Queens",
+      87: "Financial District North, Yellow Zone, Manhattan",
+      88: "Financial District South, Yellow Zone, Manhattan",
+      89: "Flatbush/Ditmas Park, Boro Zone, Brooklyn",
+      90: "Flatiron, Yellow Zone, Manhattan",
+      91: "Flatlands, Boro Zone, Brooklyn",
+      92: "Flushing, Boro Zone, Queens",
+      93: "Flushing Meadows-Corona Park, Boro Zone, Queens",
+      94: "Fordham South, Boro Zone, Bronx",
+      95: "Forest Hills, Boro Zone, Queens",
+      96: "Forest Park/Highland Park, Boro Zone, Queens",
+      97: "Fort Greene, Boro Zone, Brooklyn",
+      98: "Fresh Meadows, Boro Zone, Queens",
+      99: "Freshkills Park, Boro Zone, Staten Island",
+      100: "Garment District, Yellow Zone, Manhattan",
+      101: "Glen Oaks, Boro Zone, Queens",
+      102: "Glendale, Boro Zone, Queens",
+      103: "Governor's Island/Ellis Island/Liberty Island, Yellow Zone, Manhattan",
+      104: "Governor's Island/Ellis Island/Liberty Island, Yellow Zone, Manhattan",
+      105: "Governor's Island/Ellis Island/Liberty Island, Yellow Zone, Manhattan",
+      106: "Gowanus, Boro Zone, Brooklyn",
+      107: "Gramercy, Yellow Zone, Manhattan",
+      108: "Gravesend, Boro Zone, Brooklyn",
+      109: "Great Kills, Boro Zone, Staten Island",
+      110: "Great Kills Park, Boro Zone, Staten Island",
+      111: "Green-Wood Cemetery, Boro Zone, Brooklyn",
+      112: "Greenpoint, Boro Zone, Brooklyn",
+      113: "Greenwich Village North, Yellow Zone, Manhattan",
+      114: "Greenwich Village South, Yellow Zone, Manhattan",
+      115: "Grymes Hill/Clifton, Boro Zone, Staten Island",
+      116: "Hamilton Heights, Boro Zone, Manhattan",
+      117: "Hammels/Arverne, Boro Zone, Queens",
+      118: "Heartland Village/Todt Hill, Boro Zone, Staten Island",
+      119: "Highbridge, Boro Zone, Bronx",
+      120: "Highbridge Park, Boro Zone, Manhattan",
+      121: "Hillcrest/Pomonok, Boro Zone, Queens",
+      122: "Hollis, Boro Zone, Queens",
+      123: "Homecrest, Boro Zone, Brooklyn",
+      124: "Howard Beach, Boro Zone, Queens",
+      125: "Hudson Sq, Yellow Zone, Manhattan",
+      126: "Hunts Point, Boro Zone, Bronx",
+      127: "Inwood, Boro Zone, Manhattan",
+      128: "Inwood Hill Park, Boro Zone, Manhattan",
+      129: "Jackson Heights, Boro Zone, Queens",
+      130: "Jamaica, Boro Zone, Queens",
+      131: "Jamaica Estates, Boro Zone, Queens",
+      132: "JFK Airport, Airports, Queens",
+      133: "Kensington, Boro Zone, Brooklyn",
+      134: "Kew Gardens, Boro Zone, Queens",
+      135: "Kew Gardens Hills, Boro Zone, Queens",
+      136: "Kingsbridge Heights, Boro Zone, Bronx",
+      137: "Kips Bay, Yellow Zone, Manhattan",
+      138: "LaGuardia Airport, Airports, Queens",
+      139: "Laurelton, Boro Zone, Queens",
+      140: "Lenox Hill East, Yellow Zone, Manhattan",
+      141: "Lenox Hill West, Yellow Zone, Manhattan",
+      142: "Lincoln Square East, Yellow Zone, Manhattan",
+      143: "Lincoln Square West, Yellow Zone, Manhattan",
+      144: "Little Italy/NoLiTa, Yellow Zone, Manhattan",
+      145: "Long Island City/Hunters Point, Boro Zone, Queens",
+      146: "Long Island City/Queens Plaza, Boro Zone, Queens",
+      147: "Longwood, Boro Zone, Bronx",
+      148: "Lower East Side, Yellow Zone, Manhattan",
+      149: "Madison, Boro Zone, Brooklyn",
+      150: "Manhattan Beach, Boro Zone, Brooklyn",
+      151: "Manhattan Valley, Yellow Zone, Manhattan",
+      152: "Manhattanville, Boro Zone, Manhattan",
+      153: "Marble Hill, Boro Zone, Manhattan",
+      154: "Marine Park/Floyd Bennett Field, Boro Zone, Brooklyn",
+      155: "Marine Park/Mill Basin, Boro Zone, Brooklyn",
+      156: "Mariners Harbor, Boro Zone, Staten Island",
+      157: "Maspeth, Boro Zone, Queens",
+      158: "Meatpacking/West Village West, Yellow Zone, Manhattan",
+      159: "Melrose South, Boro Zone, Bronx",
+      160: "Middle Village, Boro Zone, Queens",
+      161: "Midtown Center, Yellow Zone, Manhattan",
+      162: "Midtown East, Yellow Zone, Manhattan",
+      163: "Midtown North, Yellow Zone, Manhattan",
+      164: "Midtown South, Yellow Zone, Manhattan",
+      165: "Midwood, Boro Zone, Brooklyn",
+      166: "Morningside Heights, Boro Zone, Manhattan",
+      167: "Morrisania/Melrose, Boro Zone, Bronx",
+      168: "Mott Haven/Port Morris, Boro Zone, Bronx",
+      169: "Mount Hope, Boro Zone, Bronx",
+      170: "Murray Hill, Yellow Zone, Manhattan",
+      171: "Murray Hill-Queens, Boro Zone, Queens",
+      172: "New Dorp/Midland Beach, Boro Zone, Staten Island",
+      173: "North Corona, Boro Zone, Queens",
+      174: "Norwood, Boro Zone, Bronx",
+      175: "Oakland Gardens, Boro Zone, Queens",
+      176: "Oakwood, Boro Zone, Staten Island",
+      177: "Ocean Hill, Boro Zone, Brooklyn",
+      178: "Ocean Parkway South, Boro Zone, Brooklyn",
+      179: "Old Astoria, Boro Zone, Queens",
+      180: "Ozone Park, Boro Zone, Queens",
+      181: "Park Slope, Boro Zone, Brooklyn",
+      182: "Parkchester, Boro Zone, Bronx",
+      183: "Pelham Bay, Boro Zone, Bronx",
+      184: "Pelham Bay Park, Boro Zone, Bronx",
+      185: "Pelham Parkway, Boro Zone, Bronx",
+      186: "Penn Station/Madison Sq West, Yellow Zone, Manhattan",
+      187: "Port Richmond, Boro Zone, Staten Island",
+      188: "Prospect-Lefferts Gardens, Boro Zone, Brooklyn",
+      189: "Prospect Heights, Boro Zone, Brooklyn",
+      190: "Prospect Park, Boro Zone, Brooklyn",
+      191: "Queens Village, Boro Zone, Queens",
+      192: "Queensboro Hill, Boro Zone, Queens",
+      193: "Queensbridge/Ravenswood, Boro Zone, Queens",
+      194: "Randalls Island, Yellow Zone, Manhattan",
+      195: "Red Hook, Boro Zone, Brooklyn",
+      196: "Rego Park, Boro Zone, Queens",
+      197: "Richmond Hill, Boro Zone, Queens",
+      198: "Ridgewood, Boro Zone, Queens",
+      199: "Rikers Island, Boro Zone, Bronx",
+      200: "Rockaway Park, Boro Zone, Queens",
+      201: "Rockaways, Boro Zone, Queens",
+      202: "Rossville/Woodrow, Boro Zone, Staten Island",
+      203: "Rugby, Boro Zone, Queens",
+      204: "Saint Albans, Boro Zone, Queens",
+      205: "Saint George/New Brighton, Boro Zone, Staten Island",
+      206: "Saint Michaels Cemetery/Woodside, Boro Zone, Queens",
+      207: "SoHo, Yellow Zone, Manhattan",
+      208: "Soundview/Bruckner, Boro Zone, Bronx",
+      209: "Soundview/Castle Hill, Boro Zone, Bronx",
+      210: "South Beach/Dongan Hills, Boro Zone, Staten Island",
+      211: "South Jamaica, Boro Zone, Queens",
+      212: "South Ozone Park, Boro Zone, Queens",
+      213: "South Williamsburg, Boro Zone, Brooklyn",
+      214: "Springfield Gardens South, Boro Zone, Queens",
+      215: "Spuyten Duyvil, Boro Zone, Bronx",
+      216: "St. George, Boro Zone, Staten Island",
+      217: "Stapleton, Boro Zone, Staten Island",
+      218: "Starrett City, Boro Zone, Brooklyn",
+      219: "Steinway, Boro Zone, Queens",
+      220: "Stuyvesant Heights, Boro Zone, Brooklyn",
+      221: "Stuyvesant Town/Peter Cooper Village, Yellow Zone, Manhattan",
+      222: "Sunnyside, Boro Zone, Queens",
+      223: "Sunset Park East, Boro Zone, Brooklyn",
+      224: "Sunset Park West, Boro Zone, Brooklyn",
+      225: "Theater District, Yellow Zone, Manhattan",
+      226: "Throgs Neck, Boro Zone, Bronx",
+      227: "Turtle Bay East, Yellow Zone, Manhattan",
+      228: "Turtle Bay West, Yellow Zone, Manhattan",
+      229: "Two Bridges/Seward Park, Yellow Zone, Manhattan",
+      230: "Unionport, Boro Zone, Bronx",
+      231: "Union Square, Yellow Zone, Manhattan",
+      232: "University Heights, Boro Zone, Bronx",
+      233: "Upper East Side North, Yellow Zone, Manhattan",
+      234: "Upper East Side South, Yellow Zone, Manhattan",
+      235: "Upper West Side North, Yellow Zone, Manhattan",
+      236: "Upper West Side South, Yellow Zone, Manhattan",
+      237: "Washington Heights North, Boro Zone, Manhattan",
+      238: "Washington Heights South, Boro Zone, Manhattan",
+      239: "West Brighton, Boro Zone, Staten Island",
+      240: "West Chelsea/Hudson Yards, Yellow Zone, Manhattan",
+      241: "West Concourse, Boro Zone, Bronx",
+      242: "West Farms/Bronx River, Boro Zone, Bronx",
+      243: "West Village, Yellow Zone, Manhattan",
+      244: "Westchester Village, Boro Zone, Bronx",
+      245: "Westerleigh, Boro Zone, Staten Island",
+      246: "Whitestone, Boro Zone, Queens",
+      247: "Willets Point, Boro Zone, Queens",
+      248: "Williamsbridge/Olinville, Boro Zone, Bronx",
+      249: "Williamsburg (North Side), Boro Zone, Brooklyn",
+      250: "Williamsburg (South Side), Boro Zone, Brooklyn",
+      251: "Windsor Terrace, Boro Zone, Brooklyn",
+      252: "Woodhaven, Boro Zone, Queens",
+      253: "Woodlawn/Wakefield, Boro Zone, Bronx",
+      254: "Woodrow, Boro Zone, Staten Island",
+      255: "World Trade Center, Yellow Zone, Manhattan",
+      256: "Yorkville East, Yellow Zone, Manhattan",
+      257: "Yorkville West, Yellow Zone, Manhattan",
+      258: "Zerega, Boro Zone, Bronx",
+      259: "Midtown Tunnel, Yellow Zone, Manhattan",
+      260: "West Bronx, Boro Zone, Bronx",
+      261: "North Bronx, Boro Zone, Bronx",
+      262: "South Bronx, Boro Zone, Bronx",
+      263: "South Manhattan, Yellow Zone, Manhattan"
+    };
+
+    // Function to populate a select element with options
+    function populateSelect(selectId, options) {
+      const select = document.getElementById(selectId);
+      // Add a placeholder option
+      const placeholderOption = document.createElement('option');
+      placeholderOption.value = '';
+      placeholderOption.textContent = '-- Select a location --';
+      placeholderOption.disabled = true;
+      placeholderOption.selected = true;
+      select.appendChild(placeholderOption);
+
+      for (const id in options) {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = options[id];
+        select.appendChild(opt);
+      }
+    }
+
+    populateSelect('pickup', locations);
+    populateSelect('drop', locations);
+  </script>
+        
+
+        <div class="form-group">
+          <label for="distance">Trip Distance (in miles)</label>
+          <input type="number" id="distance" name="distance" min="0" step="0.1" placeholder="e.g. 5.2" readonly/>
+        </div>
+ 
+        <div class="form-group">
+          <label for="Fare">Fare</label>
+          <input type="number" id="Fare" name="Fare" min="0" placeholder="e.g. 250" readonly  />
+        </div>
+
+        <div class="form-group">
+          <button type="button">Predict Fare</button>
+        </div>
+ 
+      
+	 <div class="form-group">
+ 	 <a href="https://public.tableau.com/views/TaxifarePred/Dashboard1?:language=en-US&publish=yes&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" 
+     	  target="_blank">
+    	 <button type="button" style="background-color: #0d2438; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+      			Open Tableau</button>
+  	  </a>
+	 </div>
+    </div>
+    </div>
+  
+  <script>
+    // Prevent past date/time selection
+    const datetimeInput = document.getElementById('datetime');
+    const now = new Date();
+    const pad = (n) => n.toString().padStart(2, '0');
+    const localDatetime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    datetimeInput.min = localDatetime;
+  </script>
+  <script>
+    
+      const selectedPickup = pickupSelect.value;
+      const selectedDrop = dropSelect.value;
+
+      // Clear previous message
+      messageDiv.style.display = 'none';
+      messageDiv.className = 'message';
+
+      // Check if drop location is selected
+      if (selectedDrop === "Select Drop Location") {
+        if (selectedPickup === "Select a Pickup Location") {
+          messageDiv.textContent = "Please select a drop location.";
+          messageDiv.classList.add('warning');
+          messageDiv.style.display = 'block';
+          return;
+        }
+      }
+
+      // Check if pickup and drop are the same
+      if (selectedPickup === selectedDrop) {
+        messageDiv.textContent = "Pickup Location and Drop Location cannot be same. Please select a different location.";
+        messageDiv.classList.add('error');
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      /*// Lookup average trip distance
+      const key = selectedPickup + "|" + selectedDrop;
+      const tripDistance = averageTripDistances[key];
+
+      if (tripDistance !== undefined) {
+        messageDiv.textContent = `Average Trip Distance: ${tripDistance} miles`;
+        messageDiv.classList.add('info');
+      } else {
+        messageDiv.textContent = "Average Trip Distance: Not available for the selected locations.";
+        messageDiv.classList.add('info');
+      }
+      messageDiv.style.display = 'block'; */
+    
+  </script>
+  <script>
+  async function fetchDistance() {
+    const pickupSelect = document.getElementById("pickup");
+    const dropSelect = document.getElementById("drop");
+    const pickupId = pickupSelect.value;
+    const dropId = dropSelect.value;
+
+    const pickupName = pickupSelect.options[pickupSelect.selectedIndex].text;
+    const dropName = dropSelect.options[dropSelect.selectedIndex].text;
+
+    if (pickupId && dropId && pickupId !== dropId) {
+      const response = await fetch(`/get_distance?pickup=${encodeURIComponent(pickupName)}&drop=${encodeURIComponent(dropName)}`);
+      const data = await response.json();
+      document.getElementById("distance").value = data.distance !== null ? data.distance : "N/A";
+    } else {
+      document.getElementById("distance").value = "";
+    }
+  }
+
+  document.getElementById("pickup").addEventListener("change", fetchDistance);
+  document.getElementById("drop").addEventListener("change", fetchDistance);
+</script>
+<script>
+  document.querySelector("button").addEventListener("click", async function () {
+    const datetime = document.getElementById("datetime").value;
+    const pickupSelect = document.getElementById("pickup");
+    const dropSelect = document.getElementById("drop");
+    const pickupName = pickupSelect.options[pickupSelect.selectedIndex].text;
+    const dropName = dropSelect.options[dropSelect.selectedIndex].text;
+    const distance = document.getElementById("distance").value;
+
+    if (!datetime || !pickupName || !dropName || !distance) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+ 		 datetime,
+ 		 pickup: pickupName,
+  		 drop: dropName,
+ 		 distance,
+  		 pickup_index: pickupSelect.value,
+ 		 drop_index: dropSelect.value
+	   })      
+	});
+
+      const result = await response.json();
+      document.getElementById("Fare").value = result.fare;
+    } catch (err) {
+      console.error("Prediction failed:", err);
+      alert("Failed to fetch fare. Try again.");
+    }
+  });
+</script>
+  
+
+</body>
+</html>
