@@ -1,0 +1,84 @@
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /
+$ git init
+C:/Program Files/Git/.git: Permission denied
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /
+$ cd /D
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /D
+$ cd Final_project/
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /D/Final_project
+$ git init
+Initialized empty Git repository in D:/Final_project/.git/
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /D/Final_project (master)
+$ git remote add origin https://github.com/Reetu-Mishra/Taxi_Fare_Prediction.git
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /D/Final_project (master)
+$ git checkout -b nidhi
+Switched to a new branch 'nidhi'
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /D/Final_project (nidhi)
+$ git add -a
+error: unknown switch `a'
+usage: git add [<options>] [--] <pathspec>...
+
+    -n, --[no-]dry-run    dry run
+    -v, --[no-]verbose    be verbose
+
+    -i, --[no-]interactive
+                          interactive picking
+    -p, --[no-]patch      select hunks interactively
+    -e, --[no-]edit       edit current diff and apply
+    -f, --[no-]force      allow adding otherwise ignored files
+    -u, --[no-]update     update tracked files
+    --[no-]renormalize    renormalize EOL of tracked files (implies -u)
+    -N, --[no-]intent-to-add
+                          record only the fact that the path will be added later
+    -A, --[no-]all        add changes from all tracked and untracked files
+    --[no-]ignore-removal ignore paths removed in the working tree (same as --no-all)
+    --[no-]refresh        don't add, only refresh the index
+    --[no-]ignore-errors  just skip files which cannot be added because of errors
+    --[no-]ignore-missing check if - even missing - files are ignored in dry run
+    --[no-]sparse         allow updating entries outside of the sparse-checkout cone
+    --[no-]chmod (+|-)x   override the executable bit of the listed files
+    --[no-]pathspec-from-file <file>
+                          read pathspec from file
+    --[no-]pathspec-file-nul
+                          with --pathspec-from-file, pathspec elements are separated with NUL character
+
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /D/Final_project (nidhi)
+$ git add -A
+warning: in the working copy of 'taxi_automate.sh', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'taxi_hdfs_dir.sh', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'taxi_put_data.sh', LF will be replaced by CRLF the next time Git touches it
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /D/Final_project (nidhi)
+$ git commit -m "automation files added"
+[nidhi (root-commit) 1785b15] automation files added
+ 3 files changed, 27 insertions(+)
+ create mode 100644 taxi_automate.sh
+ create mode 100644 taxi_hdfs_dir.sh
+ create mode 100644 taxi_put_data.sh
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /D/Final_project (nidhi)
+$ git push -u origin nidhi
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (5/5), 644 bytes | 322.00 KiB/s, done.
+Total 5 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+remote:
+remote: Create a pull request for 'nidhi' on GitHub by visiting:
+remote:      https://github.com/Reetu-Mishra/Taxi_Fare_Prediction/pull/new/nidhi
+remote:
+To https://github.com/Reetu-Mishra/Taxi_Fare_Prediction.git
+ * [new branch]      nidhi -> nidhi
+branch 'nidhi' set up to track 'origin/nidhi'.
+
+nidhi@LAPTOP-4TELL8RG MINGW64 /D/Final_project (nidhi)
+$
